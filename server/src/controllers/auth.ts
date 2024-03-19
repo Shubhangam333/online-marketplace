@@ -1,8 +1,8 @@
 import { RequestHandler } from "express";
 import UserModel from "src/models/user";
 import crypto from "crypto";
+import nodemailer from "nodemailer";
 import AuthVerificationTokenModel from "src/models/authVerificationToken";
-import { userInfo } from "os";
 
 export const createNewUser: RequestHandler = async (req, res) => {
   const { email, password, name } = req.body;
@@ -31,5 +31,20 @@ export const createNewUser: RequestHandler = async (req, res) => {
 
   const link = `http://localhost:8000/verify?id=${user._id}&token=${token}`;
 
-  res.send(link);
+  const transport = nodemailer.createTransport({
+    host: "sandbox.smtp.mailtrap.io",
+    port: 2525,
+    auth: {
+      user: process.env.MAILTRAP_USER,
+      pass: process.env.MAILTRAP_PASS,
+    },
+  });
+
+  await transport.sendMail({
+    from: "verification@myapp.com",
+    to: user.email,
+    html: `<h1>Please click on <a href="${link}">this link</a> to verify your account.</h1>`,
+  });
+
+  res.json({ message: "Please check your inbox." });
 };
