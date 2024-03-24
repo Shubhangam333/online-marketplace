@@ -6,6 +6,7 @@ import {
   verifyEmail,
   generateVerificationLink,
   grantAccessToken,
+  signOut,
 } from "src/controllers/auth";
 import { isAuth } from "src/middleware/auth";
 import validate from "src/middleware/validator";
@@ -19,5 +20,6 @@ authRouter.get("/verify-token", isAuth, generateVerificationLink);
 authRouter.post("/sign-in", signIn);
 authRouter.get("/profile", isAuth, sendProfile);
 authRouter.post("/refresh-token", grantAccessToken);
+authRouter.post("/sign-out", isAuth, signOut);
 
 export default authRouter;
