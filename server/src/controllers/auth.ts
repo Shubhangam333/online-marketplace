@@ -112,3 +112,40 @@ export const sendProfile: RequestHandler = async (req, res) => {
     profile: req.user,
   });
 };
+
+export const grantAccessToken: RequestHandler = async (req, res, next) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) return sendErrorRes(res, "Unauthorized request!", 403);
+
+  const payload = jwt.verify(refreshToken, "secret") as { id: string };
+  if (!payload.id) {
+    return sendErrorRes(res, "Unauthorized request", 401);
+  }
+
+  const user = await UserModel.findOne({
+    _id: payload.id,
+    tokens: refreshToken,
+  });
+
+  if (!user) {
+    //user is compromised, remove all the previous tokens
+    await UserModel.findByIdAndUpdate(payload.id, { tokens: [] });
+    return sendErrorRes(res, "Unautorized request!", 401);
+  }
+
+  const newAccessToken = jwt.sign({ id: user._id }, "secret", {
+    expiresIn: "15m",
+  });
+  const newRefreshToken = jwt.sign({ id: user._id }, "secret");
+
+  const filteredTokens = user.tokens.filter((t) => t !== refreshToken);
+  user.tokens = filteredTokens;
+  user.tokens.push(newRefreshToken);
+
+  await user.save();
+
+  res.json({
+    tokens: { refresh: newRefreshToken, access: newAccessToken },
+  });
+};
