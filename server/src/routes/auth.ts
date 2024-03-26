@@ -10,6 +10,7 @@ import {
   generateForgetPassLink,
   grantValid,
   updatePassword,
+  updateProfile,
 } from "src/controllers/auth";
 import { isAuth, isValidPassResetToken } from "src/middleware/auth";
 import validate from "src/middleware/validator";
@@ -41,5 +42,6 @@ authRouter.post(
   isValidPassResetToken,
   updatePassword
 );
+authRouter.patch("/update-profile", isAuth, updateProfile);
 
 export default authRouter;
