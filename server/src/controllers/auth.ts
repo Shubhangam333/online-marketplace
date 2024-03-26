@@ -214,7 +214,7 @@ export const updatePassword: RequestHandler = async (req, res) => {
   user.password = password;
   await user.save();
 
-  await PasswordResetTokenModel.findByIdAndDelete({ owner: user._id });
+  await PasswordResetTokenModel.findOneAndDelete({ owner: user._id });
 
   await mail.sendPasswordUpdateMessage(user.email);
 

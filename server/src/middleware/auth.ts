@@ -54,6 +54,7 @@ export const isAuth: RequestHandler = async (req, res, next) => {
 
 export const isValidPassResetToken: RequestHandler = async (req, res, next) => {
   const { id, token } = req.body;
+  console.log("i", id, token);
   const resetPassToken = await PasswordResetTokenModel.findOne({ owner: id });
 
   if (!resetPassToken)
