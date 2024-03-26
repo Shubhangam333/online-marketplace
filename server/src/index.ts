@@ -18,6 +18,7 @@ app.get("/", (req, res) => {
 app.use("/auth", authRouter);
 
 app.use(function (err, req, res, next) {
+  console.log(err);
   res.status(500).json({ message: err.message });
 } as express.ErrorRequestHandler);
 

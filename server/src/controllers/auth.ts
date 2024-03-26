@@ -5,8 +5,10 @@ import AuthVerificationTokenModel from "src/models/authVerificationToken";
 import { sendErrorRes } from "src/utils/helper";
 import jwt from "jsonwebtoken";
 import mail from "src/utils/mail";
+import PasswordResetTokenModel from "src/models/passwordResetToken";
 
 const VERIFICATION_LINK = process.env.VERIFICATION_LINK;
+const PASSWORD_RESET_LINK = process.env.PASSWORD_RESET_LINK!;
 const JWT_SECRET = process.env.JWT_SECRET!;
 
 export const createNewUser: RequestHandler = async (req, res, next) => {
@@ -169,4 +171,52 @@ export const signOut: RequestHandler = async (req, res) => {
   await user.save();
 
   res.send();
+};
+
+export const generateForgetPassLink: RequestHandler = async (req, res) => {
+  const { email } = req.body;
+
+  const user = await UserModel.findOne({ email });
+
+  if (!user) return sendErrorRes(res, "Account not found!", 404);
+
+  // Remove token
+
+  await PasswordResetTokenModel.findOneAndDelete({ owner: user._id });
+
+  // Create New Token
+  const token = crypto.randomBytes(36).toString("hex");
+  await PasswordResetTokenModel.create({ owner: user._id, token });
+
+  // send the link to user's email
+  const passResetLink = `${PASSWORD_RESET_LINK}?id=${user._id}&token=${token}`;
+
+  mail.sendPasswordResetLink(user.email, passResetLink);
+  // send response back
+
+  res.json({ message: "Please check your email." });
+};
+
+export const grantValid: RequestHandler = async (req, res) => {
+  res.json({ valid: true });
+};
+export const updatePassword: RequestHandler = async (req, res) => {
+  const { id, password } = req.body;
+
+  const user = await UserModel.findById(id);
+
+  if (!user) return sendErrorRes(res, "Unauthorized access!", 403);
+
+  const matched = await user.comparePassword(password);
+  if (matched)
+    return sendErrorRes(res, "The new password must be different", 422);
+
+  user.password = password;
+  await user.save();
+
+  await PasswordResetTokenModel.findByIdAndDelete({ owner: user._id });
+
+  await mail.sendPasswordUpdateMessage(user.email);
+
+  res.json({ message: "Password reset successfully." });
 };
