@@ -11,8 +11,11 @@ import {
   grantValid,
   updatePassword,
   updateProfile,
+  updateAvatar,
+  sendPublicProfile,
 } from "src/controllers/auth";
 import { isAuth, isValidPassResetToken } from "src/middleware/auth";
+import fileParser from "src/middleware/fileParser";
 import validate from "src/middleware/validator";
 import {
   newUserSchema,
@@ -43,5 +46,7 @@ authRouter.post(
   updatePassword
 );
 authRouter.patch("/update-profile", isAuth, updateProfile);
+authRouter.patch("/update-avatar", isAuth, fileParser, updateAvatar);
+authRouter.get("/profile/:id", isAuth, sendPublicProfile);
 
 export default authRouter;
