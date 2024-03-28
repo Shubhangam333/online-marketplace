@@ -40,6 +40,10 @@ const schema = new Schema<ProductDocument>(
       enum: [...categories],
       required: true,
     },
+    purchasingDate: {
+      type: Date,
+      required: true,
+    },
     images: [
       {
         type: Object,
