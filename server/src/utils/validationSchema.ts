@@ -1,6 +1,7 @@
 import { isValidObjectId } from "mongoose";
 import * as yup from "yup";
 import categories from "./categories";
+import { parseISO } from "date-fns";
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const passwordRegex =
@@ -61,5 +62,14 @@ export const newProductSchema = yup.object({
       return +value;
     })
     .required("Price is missing!"),
-  purchasingDate: yup.date().required("Purchasing Date is missing!"),
+  purchasingDate: yup
+    .string()
+    .transform((value) => {
+      try {
+        return parseISO(value);
+      } catch (error) {
+        return "";
+      }
+    })
+    .required("Purchasing Date is missing!"),
 });
