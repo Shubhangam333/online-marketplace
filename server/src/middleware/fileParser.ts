@@ -14,9 +14,6 @@ const fileParser: RequestHandler = async (req, res, next) => {
 
   const [fields, files] = await form.parse(req);
 
-  console.log(fields);
-  console.log(files);
-
   if (!req.body) req.body = {};
 
   for (let key in fields) {
