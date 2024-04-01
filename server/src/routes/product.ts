@@ -5,6 +5,7 @@ import {
   deleteProduct,
   deleteProductImage,
   getProductDetail,
+  getProductsByCategory,
 } from "src/controllers/product";
 import { isAuth } from "src/middleware/auth";
 import fileParser from "src/middleware/fileParser";
@@ -30,6 +31,7 @@ productRouter.patch(
 productRouter.delete("/:id", isAuth, deleteProduct);
 productRouter.delete("/image/:productId/:imageId", isAuth, deleteProductImage);
 
-productRouter.get("/:id", isAuth, getProductDetail);
+productRouter.get("/:id", getProductDetail);
+productRouter.get("/by-category/:category", getProductsByCategory);
 
 export default productRouter;
