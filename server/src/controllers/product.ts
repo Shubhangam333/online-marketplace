@@ -268,3 +268,47 @@ export const getProductsByCategory: RequestHandler = async (req, res) => {
 
   res.json({ products: listings });
 };
+export const getLatestProducts: RequestHandler = async (req, res) => {
+  const products = await ProductModel.find().sort("-createdAt").limit(10);
+  const listings = products.map((p) => {
+    return {
+      id: p._id,
+      name: p.name,
+      thumbnail: p.thumbnail,
+      category: p.category,
+      price: p.price,
+    };
+  });
+
+  res.json({ products: listings });
+};
+export const getListings: RequestHandler = async (req, res) => {
+  const { pageNo = "1", limit = "10" } = req.query as {
+    pageNo: string;
+    limit: string;
+  };
+
+  const products = await ProductModel.find({ owner: req.user.id })
+    .sort("-createdAt")
+    .skip((+pageNo - 1) * +limit)
+    .limit(+limit);
+  const listings = products.map((p) => {
+    return {
+      id: p._id,
+      name: p.name,
+      thumbnail: p.thumbnail,
+      category: p.category,
+      price: p.price,
+      image: p.images?.map((i) => i.url),
+      date: p.purchasingDate,
+      description: p.description,
+      seller: {
+        id: req.user.id,
+        name: req.user.name,
+        avatar: req.user.avatar?.url,
+      },
+    };
+  });
+
+  res.json({ products: listings });
+};
