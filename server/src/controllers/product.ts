@@ -3,6 +3,7 @@ import { RequestHandler } from "express";
 import { isValidObjectId } from "mongoose";
 import cloudUploader, { cloudApi } from "src/cloud";
 import ProductModel from "src/models/product";
+import { UserDocument } from "src/models/user";
 import { sendErrorRes } from "src/utils/helper";
 
 const uploadImage = (filePath: string): Promise<UploadApiResponse> => {
@@ -210,4 +211,34 @@ export const deleteProductImage: RequestHandler = async (req, res) => {
   await cloudUploader.destroy(imageId);
 
   res.json({ message: "Product removed successfully!" });
+};
+
+export const getProductDetail: RequestHandler = async (req, res) => {
+  const { id } = req.params;
+  if (!isValidObjectId(id))
+    return sendErrorRes(res, "Invalid product id!", 422);
+
+  const product = await ProductModel.findById(id).populate<{
+    owner: UserDocument;
+  }>("owner");
+
+  if (!product) return sendErrorRes(res, "Product not found!", 404);
+
+  res.json({
+    product: {
+      id: product._id,
+      name: product.name,
+      description: product.description,
+      thumbnail: product.thumbnail,
+      category: product.category,
+      date: product.purchasingDate,
+      price: product.price,
+      images: product.images?.map(({ url }) => url),
+      seller: {
+        id: product.owner._id,
+        name: product.owner.name,
+        avatar: product.owner.avatar?.url,
+      },
+    },
+  });
 };
