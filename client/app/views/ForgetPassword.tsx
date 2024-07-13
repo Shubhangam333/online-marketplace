@@ -6,28 +6,36 @@ import FormNavigator from "@ui/FormNavigator";
 import WelcomeHeader from "app/ui/WelcomeHeader";
 import { FC } from "react";
 import { View, StyleSheet } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { AuthStackParamList } from "app/navigator/AuthNavigator";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 interface Props {}
 
 const ForgetPassword: FC<Props> = (props) => {
+  const { navigate } =
+    useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
   return (
     <CustomKeyAvoidingView>
       <View style={styles.innerContainer}>
         <WelcomeHeader />
         <View style={styles.formContainer}>
-          <FormInput placeholder="Name" />
           <FormInput
             placeholder="Email"
             keyboardType="email-address"
             autoCapitalize="none"
           />
-          <FormInput placeholder="Password" secureTextEntry />
 
-          <AppButton title="Sign In" />
+          <AppButton title="Request Link" />
 
           <FormDivider />
 
-          <FormNavigator leftTitle="Sign Up" rightTitle="Sign In" />
+          <FormNavigator
+            onLeftPress={() => navigate("SignUp")}
+            onRightPress={() => navigate("SignIn")}
+            leftTitle="Sign Up"
+            rightTitle="Sign In"
+          />
         </View>
       </View>
     </CustomKeyAvoidingView>
