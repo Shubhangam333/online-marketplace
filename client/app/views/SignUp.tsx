@@ -9,10 +9,12 @@ import { View, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { AuthStackParamList } from "app/navigator/AuthNavigator";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import * as yup from "yup";
 import axios from "axios";
 import { newUserSchema, yupValidate } from "@utils/validator";
 import { runAxiosAsync } from "app/api/runAxiosAsync";
+import { showMessage } from "react-native-flash-message";
+import client from "app/api/client";
+import { SignInRes } from "./SignIn";
 
 interface Props {}
 
@@ -22,6 +24,7 @@ const SignUp: FC<Props> = (props) => {
     email: "",
     password: "",
   });
+  const [busy, setBusy] = useState(false);
   const { navigate } =
     useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
   const { name, email, password } = userInfo;
@@ -32,10 +35,24 @@ const SignUp: FC<Props> = (props) => {
 
   const handleSubmit = async () => {
     const { values, error } = await yupValidate(newUserSchema, userInfo);
+
+    if (error) {
+      return showMessage({ message: error, type: "danger" });
+    }
+    setBusy(true);
     const res = await runAxiosAsync<{ message: string }>(
-      axios.post("http://10.0.2.2:8000/auth/sign-up", values)
+      client.post("/auth/sign-up", values)
     );
-    console.log(res);
+
+    if (res?.message) {
+      showMessage({ message: res.message, type: "success" });
+      const signInRes = await runAxiosAsync<SignInRes>(
+        client.post("/auth/sign-in", values)
+      );
+      console.log(signInRes);
+    }
+
+    setBusy(false);
   };
 
   return (
@@ -62,7 +79,7 @@ const SignUp: FC<Props> = (props) => {
             onChangeText={handleChange("password")}
           />
 
-          <AppButton title="Sign Up" onPress={handleSubmit} />
+          <AppButton active={!busy} title="Sign Up" onPress={handleSubmit} />
 
           <FormDivider />
 
