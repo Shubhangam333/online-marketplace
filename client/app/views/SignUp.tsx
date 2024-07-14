@@ -14,7 +14,7 @@ import { newUserSchema, yupValidate } from "@utils/validator";
 import { runAxiosAsync } from "app/api/runAxiosAsync";
 import { showMessage } from "react-native-flash-message";
 import client from "app/api/client";
-import { SignInRes } from "./SignIn";
+import useAuth from "app/hooks/useAuth";
 
 interface Props {}
 
@@ -27,6 +27,7 @@ const SignUp: FC<Props> = (props) => {
   const [busy, setBusy] = useState(false);
   const { navigate } =
     useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
+  const { signIn } = useAuth();
   const { name, email, password } = userInfo;
 
   const handleChange = (name: string) => (text: string) => {
@@ -46,10 +47,7 @@ const SignUp: FC<Props> = (props) => {
 
     if (res?.message) {
       showMessage({ message: res.message, type: "success" });
-      const signInRes = await runAxiosAsync<SignInRes>(
-        client.post("/auth/sign-in", values)
-      );
-      console.log(signInRes);
+      signIn(values!);
     }
 
     setBusy(false);

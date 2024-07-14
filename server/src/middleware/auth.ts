@@ -3,9 +3,10 @@ import { sendErrorRes } from "src/utils/helper";
 import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import UserModel from "src/models/user";
 import PasswordResetTokenModel from "src/models/passwordResetToken";
+import { Schema } from "mongoose";
 
 interface UserProfile {
-  id: string;
+  id: Schema.Types.ObjectId;
   name: string;
   email: string;
   verified: boolean;

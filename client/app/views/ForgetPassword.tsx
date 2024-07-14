@@ -4,17 +4,38 @@ import FormDivider from "@ui/FormDivider";
 import FormInput from "@ui/FormInput";
 import FormNavigator from "@ui/FormNavigator";
 import WelcomeHeader from "app/ui/WelcomeHeader";
-import { FC } from "react";
+import { FC, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { AuthStackParamList } from "app/navigator/AuthNavigator";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { emailRegex } from "@utils/validator";
+import { showMessage } from "react-native-flash-message";
+import { runAxiosAsync } from "app/api/runAxiosAsync";
+import client from "app/api/client";
 
 interface Props {}
 
 const ForgetPassword: FC<Props> = (props) => {
+  const [email, setEmail] = useState("");
+  const [busy, setBusy] = useState(false);
   const { navigate } =
     useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
+
+  const handleSubmit = async () => {
+    if (!emailRegex.test(email)) {
+      return showMessage({ message: "Invalid email id!" });
+    }
+
+    setBusy(true);
+    const res = await runAxiosAsync<{ message: string }>(
+      client.post("/auth/forget-pass", { email })
+    );
+    setBusy(false);
+    if (res) {
+      showMessage({ message: res.message, type: "success" });
+    }
+  };
   return (
     <CustomKeyAvoidingView>
       <View style={styles.innerContainer}>
@@ -24,9 +45,15 @@ const ForgetPassword: FC<Props> = (props) => {
             placeholder="Email"
             keyboardType="email-address"
             autoCapitalize="none"
+            value={email}
+            onChangeText={(text) => setEmail(text)}
           />
 
-          <AppButton title="Request Link" />
+          <AppButton
+            active={!busy}
+            title={busy ? "Please Wait..." : "Request Link"}
+            onPress={handleSubmit}
+          />
 
           <FormDivider />
 

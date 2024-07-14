@@ -25,7 +25,6 @@ export const runAxiosAsync = async <T>(
         message = response.data.message;
       }
     }
-    console.log("m", message, error);
     showMessage({ message, type: "danger" });
   }
 
