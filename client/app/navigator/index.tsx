@@ -3,14 +3,14 @@ import { StyleSheet } from "react-native";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import colors from "@utils/colors";
 import AuthNavigator from "app/navigator/AuthNavigator";
-import AppNavigator from "app/navigator/AppNavigator";
-import { useDispatch, useSelector } from "react-redux";
-import { getAuthState, Profile, updateAuthState } from "app/store/auth";
+import { useDispatch } from "react-redux";
+import { Profile, updateAuthState } from "app/store/auth";
 import client from "app/api/client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { runAxiosAsync } from "app/api/runAxiosAsync";
 import LoadingSpinner from "@ui/LoadingSpinner";
 import useAuth from "app/hooks/useAuth";
+import TabNavigator from "./TabNavigator";
 
 interface Props {}
 
@@ -53,7 +53,7 @@ const Navigator: FC<Props> = (props) => {
   return (
     <NavigationContainer theme={MyTheme}>
       <LoadingSpinner visible={authState.pending} />
-      {!loggedIn ? <AuthNavigator /> : <AppNavigator />}
+      {!loggedIn ? <AuthNavigator /> : <TabNavigator />}
     </NavigationContainer>
   );
 };
