@@ -9,14 +9,8 @@ import { View, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { AuthStackParamList } from "app/navigator/AuthNavigator";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { newUserSchema, signInSchema, yupValidate } from "@utils/validator";
+import { signInSchema, yupValidate } from "@utils/validator";
 import { showMessage } from "react-native-flash-message";
-import { runAxiosAsync } from "app/api/runAxiosAsync";
-import axios from "axios";
-import client from "app/api/client";
-import { useDispatch } from "react-redux";
-import { updateAuthState } from "app/store/auth";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import useAuth from "app/hooks/useAuth";
 
 interface Props {}
