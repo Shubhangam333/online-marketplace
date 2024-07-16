@@ -32,7 +32,13 @@ const OptionModal = <T extends unknown>({
           <ScrollView>
             {options.map((item, index) => {
               return (
-                <Pressable key={index} onPress={() => onPress(item)}>
+                <Pressable
+                  key={index}
+                  onPress={() => {
+                    onPress(item);
+                    handleClose();
+                  }}
+                >
                   {renderItem(item)}
                 </Pressable>
               );

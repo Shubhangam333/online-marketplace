@@ -1,6 +1,13 @@
 import FormInput from "@ui/FormInput";
 import { FC, useState } from "react";
-import { View, StyleSheet, Pressable, Text } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Pressable,
+  Text,
+  FlatList,
+  Image,
+} from "react-native";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import colors from "@utils/colors";
 import DatePicker from "@ui/DatePicker";
@@ -10,37 +17,107 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import CategoryOption from "@ui/CategoryOption";
 import AppButton from "@ui/AppButton";
 import CustomKeyAvoidingView from "@ui/CustomKeyAvoidingView";
+import * as ImagePicker from "expo-image-picker";
+import { showMessage } from "react-native-flash-message";
+import HorizontalImageList from "@components/HorizontalImageList";
 
 interface Props {}
 
+const defaultInfo = {
+  name: "",
+  description: "",
+  category: "",
+  price: "",
+  purchasingDate: new Date(),
+};
+
 const NewListing: FC<Props> = (props) => {
+  const [productInfo, setProductInfo] = useState({ ...defaultInfo });
   const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [images, setImages] = useState<string[]>([]);
+
+  const { category, description, name, price, purchasingDate } = productInfo;
+
+  const handleChange = (name: string) => (text: string) => {
+    setProductInfo({ ...productInfo, [name]: text });
+  };
+
+  const handleSubmit = () => {
+    console.log(productInfo);
+  };
+
+  const handleOnImageSelection = async () => {
+    try {
+      const { assets } = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: false,
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 0.3,
+        allowsMultipleSelection: true,
+      });
+
+      if (!assets) return;
+
+      const imageUris = assets.map(({ uri }) => uri);
+      setImages([...images, ...imageUris]);
+    } catch (error) {
+      showMessage({ message: (error as any).message, type: "danger" });
+    }
+  };
+
   return (
     <CustomKeyAvoidingView>
       <View style={styles.container}>
-        <Pressable style={styles.fileSelector}>
-          <View style={styles.iconContainer}>
-            <FontAwesome5 name="images" size={24} color="black" />
-          </View>
-          <Text style={styles.btnTitle}>Add Images</Text>
-        </Pressable>
-        <FormInput placeholder="Product name" />
-        <FormInput placeholder="Price" />
+        <View style={styles.imageContainer}>
+          <Pressable
+            onPress={handleOnImageSelection}
+            style={styles.fileSelector}
+          >
+            <View style={styles.iconContainer}>
+              <FontAwesome5 name="images" size={24} color="black" />
+            </View>
+            <Text style={styles.btnTitle}>Add Images</Text>
+          </Pressable>
+          <HorizontalImageList
+            images={images}
+            onLongPress={(img) => {
+              console.log(img);
+            }}
+          />
+        </View>
+        <FormInput
+          value={name}
+          placeholder="Product name"
+          onChangeText={handleChange("name")}
+        />
+        <FormInput
+          value={price}
+          placeholder="Price"
+          onChangeText={handleChange("price")}
+          keyboardType="numeric"
+        />
         <DatePicker
           title="Purchasing Date: "
-          value={new Date()}
-          onChange={() => {}}
+          value={purchasingDate}
+          onChange={(date) =>
+            setProductInfo({ ...productInfo, purchasingDate })
+          }
         />
         <Pressable
           style={styles.categorySelector}
           onPress={() => setShowCategoryModal(true)}
         >
-          <Text>Category</Text>
+          <Text>{category || "Category"}</Text>
           <AntDesign name="caretdown" color={colors.primary} />
         </Pressable>
-        <FormInput placeholder="Description" multiline numberOfLines={4} />
+        <FormInput
+          value={description}
+          placeholder="Description"
+          multiline
+          numberOfLines={4}
+          onChangeText={handleChange("description")}
+        />
 
-        <AppButton title="List Product" />
+        <AppButton title="List Product" onPress={handleSubmit} />
 
         <OptionModal
           visible={showCategoryModal}
@@ -49,9 +126,9 @@ const NewListing: FC<Props> = (props) => {
           renderItem={(item) => {
             return <CategoryOption {...item} />;
           }}
-          onPress={(item) => {
-            console.log(item);
-          }}
+          onPress={(item) =>
+            setProductInfo({ ...productInfo, category: item.name })
+          }
         />
       </View>
     </CustomKeyAvoidingView>
@@ -62,6 +139,9 @@ const styles = StyleSheet.create({
   container: {
     padding: 15,
     flex: 1,
+  },
+  imageContainer: {
+    flexDirection: "row",
   },
   fileSelector: {
     alignItems: "center",
@@ -78,6 +158,12 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: colors.primary,
     borderRadius: 7,
+  },
+  selectedImage: {
+    width: 70,
+    height: 70,
+    borderRadius: 7,
+    marginLeft: 5,
   },
   btnTitle: {
     color: colors.primary,
