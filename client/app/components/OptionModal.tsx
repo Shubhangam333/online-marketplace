@@ -1,13 +1,5 @@
 import colors from "@utils/colors";
-import { FC } from "react";
-import {
-  View,
-  StyleSheet,
-  Modal,
-  ScrollView,
-  Text,
-  Pressable,
-} from "react-native";
+import { View, StyleSheet, Modal, ScrollView, Pressable } from "react-native";
 
 interface Props<T> {
   visible: boolean;
