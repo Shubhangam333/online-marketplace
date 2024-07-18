@@ -1,11 +1,10 @@
 import axios from "axios";
 import { baseURL } from "app/api/client";
-import useAuth from "./useAuth";
 import createAuthRefreshInterceptor from "axios-auth-refresh";
 import asyncStorage, { Keys } from "@utils/asyncStorage";
 import { runAxiosAsync } from "app/api/runAxiosAsync";
-import { useDispatch } from "react-redux";
-import { updateAuthState } from "app/store/auth";
+import { useDispatch, useSelector } from "react-redux";
+import { getAuthState, updateAuthState } from "app/store/auth";
 
 const authClient = axios.create({ baseURL });
 
@@ -17,7 +16,8 @@ type Response = {
 };
 
 const useClient = () => {
-  const { authState } = useAuth();
+  // const { authState } = useAuth();
+  const authState = useSelector(getAuthState);
   const dispatch = useDispatch();
 
   const token = authState.profile?.accessToken;

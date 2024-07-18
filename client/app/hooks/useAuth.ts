@@ -4,6 +4,7 @@ import client from "app/api/client";
 import { runAxiosAsync } from "app/api/runAxiosAsync";
 import { getAuthState, updateAuthState } from "app/store/auth";
 import { useDispatch, useSelector } from "react-redux";
+import useClient from "./useClient";
 
 type UserInfo = {
   email: string;
@@ -25,6 +26,7 @@ export interface SignInRes {
 }
 
 const useAuth = () => {
+  const { authClient } = useClient();
   const dispatch = useDispatch();
   const authState = useSelector(getAuthState);
   const signIn = async (userInfo: UserInfo) => {
@@ -48,9 +50,21 @@ const useAuth = () => {
     }
   };
 
+  const signOut = async () => {
+    const token = await asyncStorage.get(Keys.REFRESH_TOKEN);
+    if (token) {
+      dispatch(updateAuthState({ profile: authState.profile, pending: true }));
+      const res = await runAxiosAsync(
+        authClient.post("/auth/sign-out", { refreshToken: token })
+      );
+      await asyncStorage.remove(Keys.REFRESH_TOKEN);
+      dispatch(updateAuthState({ profile: null, pending: false }));
+    }
+  };
+
   const loggedIn = authState.profile ? true : false;
 
-  return { signIn, authState, loggedIn };
+  return { signIn, signOut, authState, loggedIn };
 };
 
 export default useAuth;
