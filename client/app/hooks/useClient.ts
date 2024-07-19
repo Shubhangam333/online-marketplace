@@ -52,6 +52,13 @@ const useClient = () => {
     if (res?.tokens) {
       failedRequest.response.config.headers.Authorization =
         "Bearer " + res.tokens.access;
+
+      //to handle signout if the token is expired
+      if (failedRequest.response.config.url === "/auth/sign-out") {
+        failedRequest.response.config.data = {
+          refreshToken: res.tokens.refresh,
+        };
+      }
       await asyncStorage.save(Keys.AUTH_TOKEN, res.tokens.access);
       await asyncStorage.save(Keys.REFRESH_TOKEN, res.tokens.refresh);
       dispatch(
