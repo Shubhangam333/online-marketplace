@@ -14,7 +14,7 @@ import TabNavigator from "./TabNavigator";
 import useClient from "app/hooks/useClient";
 import asyncStorage, { Keys } from "@utils/asyncStorage";
 
-type ProfileRes = {
+export type ProfileRes = {
   profile: {
     id: string;
     name: string;

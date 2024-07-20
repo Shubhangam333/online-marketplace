@@ -17,6 +17,7 @@
     "@reduxjs/toolkit": "^2.2.6",
     "axios": "^1.7.2",
     "axios-auth-refresh": "^3.3.6",
+    "deep-equal": "^2.2.3",
     "expo": "^51.0.20",
     "expo-image-picker": "~15.0.7",
     "expo-status-bar": "~1.12.1",
@@ -37,6 +38,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@types/deep-equal": "^1.0.4",
     "@types/luxon": "^3.4.2",
     "@types/react": "~18.2.79",
     "typescript": "~5.3.3"

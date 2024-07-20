@@ -9,7 +9,7 @@ interface Props {
 }
 
 const iconContainerFactor = 0.7;
-const iconSizeFactor = 0.7;
+const iconSizeFactor = 0.8;
 
 const AvatarView: FC<Props> = ({ size = 50, uri }) => {
   const iconContainerSize = size * iconContainerFactor;
@@ -31,7 +31,7 @@ const AvatarView: FC<Props> = ({ size = 50, uri }) => {
             {
               width: iconContainerSize,
               height: iconContainerSize,
-              borderRadius: iconContainerSize,
+              borderRadius: iconContainerSize / 2,
             },
             styles.iconContainer,
           ]}
@@ -47,7 +47,9 @@ const styles = StyleSheet.create({
   container: {
     overflow: "hidden",
   },
-  flex1: { flex: 1 },
+  flex1: {
+    flex: 1,
+  },
   profileIcon: {
     backgroundColor: colors.primary,
     alignItems: "center",

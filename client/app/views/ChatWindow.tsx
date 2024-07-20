@@ -5,7 +5,7 @@ import { View, StyleSheet } from "react-native";
 
 interface Props {}
 
-const Chats: FC<Props> = (props) => {
+const ChatWindow: FC<Props> = (props) => {
   return (
     <View style={styles.container}>
       <AppHeader backButton={<BackButton />} />
@@ -17,4 +17,4 @@ const styles = StyleSheet.create({
   container: {},
 });
 
-export default Chats;
+export default ChatWindow;
